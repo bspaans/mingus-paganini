@@ -9,9 +9,9 @@ import dsl
 def to_midi(filename, track, bpm = 120):
     midi_file_out.write_Track(filename, track, bpm)
 
-plan = dsl.parse_string(dsl.example)
+plan, bpm = dsl.parse_string(dsl.example)
 builder = TrackBuilder()
 for arpeggio, duration in plan:
     builder.fill_bars(arpeggio, duration[0], duration[1])
 
-to_midi("arpeggio_test.mid", builder.track, 120)
+to_midi("arpeggio_test.mid", builder.track, bpm)

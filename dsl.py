@@ -5,6 +5,7 @@ from builders import NotesBuilder
 import sys
 
 example = """
+bpm: 150
 updown: Cmaj7 -octave, 32 x 1
 updown: Fmaj7 -octave, 32 x 1
 updown: Cmaj7 -octave, 32 x 1
@@ -42,15 +43,30 @@ def parse_duration(duration):
 
 def parse_string(string):
     result = []
+    bpm = 120
     for s in string.split('\n'):
-        if s.startswith("updown:"):
+        if s.strip() == '' or s.startswith('#') or s.startswith('//'):
+            continue
+        elif s.startswith("updown:"):
             arpeggio = UpAndDownArpeggiator()
-            params = s[8:]
-            comma = params.find(",")
-            if comma != -1:
-                notes = params[:comma]
-                duration = params[comma + 1:]
-                arpeggio.set_notes(parse_notes(notes))
-                result.append((arpeggio, parse_duration(duration)))
-    return result
+        elif s.startswith("random:"):
+            arpeggio = RandomArpeggiator()
+        elif s.startswith("bpm:"):
+            bpm_str = s[5:]
+            if not bpm_str.isdigit():
+                print "Error: bpm is not an integer:", bpm_str
+                sys.exit(1)
+            bpm = int(bpm_str)
+            continue
+        else:
+            print "Warning: unknown command:", s
+            continue
+        params = s[8:]
+        comma = params.find(",")
+        if comma != -1:
+            notes = params[:comma]
+            duration = params[comma + 1:]
+            arpeggio.set_notes(parse_notes(notes))
+            result.append((arpeggio, parse_duration(duration)))
+    return result, bpm
 
