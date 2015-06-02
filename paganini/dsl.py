@@ -1,7 +1,8 @@
 #!/usr/bin/env python 
 
+from mingus.core import chords
+from mingus.containers import Note
 from arpeggiators import UpAndDownArpeggiator, RandomArpeggiator
-from builders import NotesBuilder
 import sys
 
 example = """
@@ -11,6 +12,23 @@ updown: Fmaj7 -octave, 64 x 1
 updown: Cmaj7 -octave, 64 x 1
 updown: Gdom7 -octave +octave, 64 x 1
 """
+
+class NotesBuilder(object):
+
+    def get_notes_from_chord(self, chord = 'Cmaj7', octaves_above = 0, octaves_below = 0):
+        notes = []
+        for n in chords.from_shorthand(chord):
+            note = Note(n)
+            notes.append(note)
+            for i in xrange(octaves_above):
+                note = Note(n)
+                note.octave += i + 1
+                notes.append(note)
+            for i in xrange(octaves_below):
+                note = Note(n)
+                note.octave -= i + 1
+                notes.append(note)
+        return sorted(notes)
 
 def parse_notes(notes):
     parts = notes.split()

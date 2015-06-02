@@ -1,6 +1,6 @@
 
-from mingus.containers import NoteContainer, Bar, Note, Track
-from mingus.core import chords
+from mingus.containers import Bar, Track
+import dsl
 
 class TrackBuilder(object):
     def __init__(self):
@@ -17,19 +17,10 @@ class TrackBuilder(object):
             bars -= 1
         return self.track
 
-class NotesBuilder(object):
+    def from_dsl(self, string):
+        plan, bpm = dsl.parse_string(string)
+        for arpeggio, duration in plan:
+            self.fill_bars(arpeggio, duration[0], duration[1])
+        return self.track, bpm
 
-    def get_notes_from_chord(self, chord = 'Cmaj7', octaves_above = 0, octaves_below = 0):
-        notes = []
-        for n in chords.from_shorthand(chord):
-            note = Note(n)
-            notes.append(note)
-            for i in xrange(octaves_above):
-                note = Note(n)
-                note.octave += i + 1
-                notes.append(note)
-            for i in xrange(octaves_below):
-                note = Note(n)
-                note.octave -= i + 1
-                notes.append(note)
-        return sorted(notes)
+
