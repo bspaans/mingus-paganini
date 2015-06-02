@@ -14,4 +14,8 @@ builder = TrackBuilder()
 for arpeggio, duration in plan:
     builder.fill_bars(arpeggio, duration[0], duration[1])
 
-to_midi("arpeggio_test.mid", builder.track, bpm)
+
+def main():
+    to_midi("arpeggio_test.mid", builder.track, bpm)
+    print("Written arpeggio_test.mid")
+
