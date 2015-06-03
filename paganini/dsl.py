@@ -5,13 +5,6 @@ from mingus.containers import Note
 from arpeggiators import UpAndDownArpeggiator, RandomArpeggiator
 import sys
 
-example = """
-bpm: 150
-updown: Cmaj7 -octave, 64 x 1
-updown: Fmaj7 -octave, 64 x 1
-updown: Cmaj7 -octave, 64 x 1
-updown: Gdom7 -octave +octave, 64 x 1
-"""
 
 class NotesBuilder(object):
 
@@ -30,7 +23,7 @@ class NotesBuilder(object):
                 notes.append(note)
         return sorted(notes)
 
-def parse_notes(notes):
+def parse_notes(notes, quit_on_error = True):
     parts = notes.split()
     chord = parts[0]
     octaves_below = 0
@@ -42,9 +35,11 @@ def parse_notes(notes):
             octaves_above += 1
         else:
             print "Warning: unknown option", p
+            if quit_on_error:
+                sys.exit(1)
     return NotesBuilder().get_notes_from_chord(chord, octaves_above, octaves_below)
 
-def parse_duration(duration):
+def parse_duration(duration, quit_on_error = True):
     times = duration.find('x')
     if times == -1:
         print "Error: missing number of bars"
@@ -59,7 +54,7 @@ def parse_duration(duration):
         sys.exit(1)
     return (int(note_duration), int(bars))
 
-def parse_string(string):
+def parse_string(string, quit_on_error = True):
     result = []
     bpm = 120
     for s in string.split('\n'):
@@ -78,13 +73,15 @@ def parse_string(string):
             continue
         else:
             print "Warning: unknown command:", s
+            if quit_on_error:
+                sys.exit(1)
             continue
         params = s[8:]
         comma = params.find(",")
         if comma != -1:
             notes = params[:comma]
             duration = params[comma + 1:]
-            arpeggio.set_notes(parse_notes(notes))
-            result.append((arpeggio, parse_duration(duration)))
+            arpeggio.set_notes(parse_notes(notes, quit_on_error))
+            result.append((arpeggio, parse_duration(duration, quit_on_error)))
     return result, bpm
 
