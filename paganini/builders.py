@@ -18,9 +18,10 @@ class TrackBuilder(object):
         return self.track
 
     def from_dsl(self, string):
-        plan, bpm = dsl.parse_string(string)
-        for arpeggio, duration in plan:
-            self.fill_bars(arpeggio, duration[0], duration[1])
+        plan, bpm, loop = dsl.parse_string(string)
+        for x in range(loop):
+            for arpeggio, duration in plan:
+                self.fill_bars(arpeggio, duration[0], duration[1])
         return self.track, bpm
 
 

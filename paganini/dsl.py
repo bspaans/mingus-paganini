@@ -57,6 +57,7 @@ def parse_duration(duration, quit_on_error = True):
 def parse_string(string, quit_on_error = True):
     result = []
     bpm = 120
+    loop = 1
     for s in string.split('\n'):
         if s.strip() == '' or s.startswith('#') or s.startswith('//'):
             continue
@@ -71,6 +72,13 @@ def parse_string(string, quit_on_error = True):
                 sys.exit(1)
             bpm = int(bpm_str)
             continue
+        elif s.startswith("loop:"):
+            loop_str = s[6:]
+            if not loop_str.isdigit():
+                print "Error: loop is not an integer:", loop_str
+                sys.exit(1)
+            loop = int(loop_str)
+            continue
         else:
             print "Warning: unknown command:", s
             if quit_on_error:
@@ -83,5 +91,5 @@ def parse_string(string, quit_on_error = True):
             duration = params[comma + 1:]
             arpeggio.set_notes(parse_notes(notes, quit_on_error))
             result.append((arpeggio, parse_duration(duration, quit_on_error)))
-    return result, bpm
+    return result, bpm, loop
 
